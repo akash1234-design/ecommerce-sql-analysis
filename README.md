@@ -1,45 +1,71 @@
-# E-Commerce Sales Analysis using MySQL
+# E-commerce Sales Dashboard 📊 | SQL Analytics
 
-## 📊 Project Overview
-Designed and queried a relational database for an e-commerce platform to derive business insights on revenue, customers, and products. This project demonstrates SQL skills in data modeling, complex joins, CTEs, and window functions.
+Interactive Streamlit dashboard powered by SQL to analyze e-commerce sales data. Track monthly revenue, top customers, best-selling products, and city-wise performance using SQL queries.
 
-## 🛠️ Tech Stack
-- **Database:** MySQL 8.0
-- **Tools:** MySQL Workbench
-- **Concepts:** Database Design, Foreign Keys, JOINs, GROUP BY, CTE, Window Functions
+### 🚀 Live Demo
+**[Click Here to Launch Dashboard](https://ecommerce-sql-analysis-kzy2frzfqkgyd4a4xz9kxm.streamlit.app/)** 
 
-## 🗂️ Database Schema
-The database consists of 4 relational tables with proper constraints:
+### 📸 Dashboard Preview
+![E-commerce Sales Dashboard](ecommerce-sql-dashboard.png)
 
-**1. customers** - Stores customer information
-**2. products** - Product catalog with categories and pricing  
-**3. orders** - Order header with customer reference and status
-**4. order_items** - Line items for each order with product reference
+### 🔥 Key SQL-Powered Features
 
-**ER Diagram:** `customers` 1:N `orders` 1:N `order_items` N:1 `products`
+**1. Month-wise Revenue**
+- SQL `GROUP BY` + `DATE_TRUNC` to aggregate monthly sales
+- Identifies seasonal trends: June peak, July-August dip, Sep-Oct recovery
 
-## 📈 Key Business Questions Solved
+**2. Top 3 Customers by Revenue**
+- `JOIN` customers + orders table
+- `ORDER BY total_spent DESC LIMIT 3`
+- Amit Sharma, Priya Singh, Sneha Patel are highest value customers
 
-| Query | Business Question | SQL Concept Used |
-| --- | --- | --- |
-| 1 | Month-over-Month Revenue Trend | GROUP BY, DATE_FORMAT |
-| 2 | Top 3 High-Value Customers | JOIN, ORDER BY, LIMIT |
-| 3 | Best Selling Products by Quantity | JOIN 3 Tables, SUM |
-| 4 | Best Selling Products by Revenue | Aggregate Functions |
-| 5 | Customer Ranking by Spending | Window Function RANK() |
-| 6 | Category-wise Revenue Contribution % | Window Function OVER() |
-| 7 | Sales Performance by Price Range | CASE WHEN, GROUP BY |
-| 8 | MoM Growth Percentage | CTE, LAG() Window Function |
+**3. Best Selling Products**
+- `GROUP BY product_id` with `SUM(quantity)` and `SUM(revenue)`
+- Categories: Home, Electronics, Fashion
+- Top Product: Coffee Mug - 5 units sold
 
-## 💡 Key Insights from Analysis
-1. **Revenue:** May 2024 generated ₹1,36,898 from 3 delivered orders vs ₹45,000 in June
-2. **Top Customer:** Rahul Sharma from Delhi contributed ₹83,899 with 2 orders - 61% of total revenue
-3. **Top Category:** Electronics drove 84% of revenue share
-4. **Star Product:** iPhone 15 generated highest revenue ₹79,900 despite only 1 unit sold
-5. **Price Range:** Products above ₹50K contributed maximum revenue
+**4. City-wise Revenue**
+- `GROUP BY city` to find top performing locations
+- Pie chart: Delhi, Mumbai, Pune, Bangalore revenue split
 
-## 🚀 How to Run This Project
+**5. Products Sold by Category**
+- Bar chart comparison: Home vs Electronics vs Fashion
+- Helps in inventory planning decisions
 
-**Step 1: Create Database & Tables**
+### 💡 Business Questions This Dashboard Answers
+1. Which month had the highest revenue in 2023?
+2. Who are our top 3 revenue-generating customers?
+3. Which product category sells the most quantity?
+4. Which city contributes maximum revenue to the business?
+
+### 🛠️ Tech Stack
+- **Frontend**: Streamlit
+- **Database**: SQLite / PostgreSQL
+- **Query Language**: SQL - JOINs, GROUP BY, Aggregations, Window Functions
+- **Visualization**: Plotly, Matplotlib
+- **Data Processing**: Pandas
+
+### 💻 SQL Queries Used
 ```sql
-Run 01_schema.sql
+-- 1. Month-wise Revenue
+SELECT DATE_TRUNC('month', order_date) AS month, 
+       SUM(amount) AS total_revenue 
+FROM orders 
+GROUP BY month 
+ORDER BY month;
+
+-- 2. Top 3 Customers
+SELECT c.name, SUM(o.amount) AS total_spent
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.name
+ORDER BY total_spent DESC LIMIT 3;
+
+-- 3. Best Selling Products
+SELECT p.name, p.category, 
+       SUM(oi.quantity) AS total_quantity_sold,
+       SUM(oi.quantity * oi.price) AS total_revenue
+FROM products p
+JOIN order_items oi ON p.product_id = oi.product_id
+GROUP BY p.name, p.category
+ORDER BY total_quantity_sold DESC;
